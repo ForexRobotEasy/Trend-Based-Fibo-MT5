@@ -1,0 +1,97 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                           Trend Based Fibo MT5   |
+//|                                 Developer: Forex Robot Easy Team |
+//|                                       Developer's site: forexroboteasy.com |
+//+------------------------------------------------------------------+
+
+#property strict
+
+// Input parameters
+input int fiboLevels = 7; // Number of Fibonacci levels
+input ENUM_TIMEFRAMES timeframe = PERIOD_CURRENT; // Chart timeframe
+input ENUM_APPLIED_PRICE priceType = PRICE_CLOSE; // Price type for calculating Fibonacci levels
+
+// Global variables
+double fiboLevelsArray[7]; // Array to store Fibonacci levels
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Calculate Fibonacci levels
+   CalculateFiboLevels();
+   
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   // Clean up
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime& time[],
+                const double& open[],
+                const double& high[],
+                const double& low[],
+                const double& close[],
+                const long& tick_volume[],
+                const long& volume[],
+                const int& spread[])
+{
+   // Calculate Fibonacci levels
+   CalculateFiboLevels();
+   
+   return(rates_total);
+}
+
+//+------------------------------------------------------------------+
+//| Calculate Fibonacci levels                                       |
+//+------------------------------------------------------------------+
+void CalculateFiboLevels()
+{
+   // Calculate start and end index based on timeframe
+   int startIndex = iBarShift(NULL, timeframe, iTime(NULL, timeframe, 0));
+   int endIndex = iBarShift(NULL, timeframe, iTime(NULL, timeframe, 1));
+   
+   // Calculate Fibonacci levels
+   for(int i = 0; i < fiboLevels; i++)
+   {
+      double level = iHigh(NULL, timeframe, startIndex) - iLow(NULL, timeframe, startIndex);
+      level = level * i / fiboLevels;
+      
+      fiboLevelsArray[i] = iHigh(NULL, timeframe, startIndex) - level;
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator properties                                      |
+//+------------------------------------------------------------------+
+string GetIndicatorName()
+{
+   return 'Trend Based Fibo MT5';
+}
+
+string GetIndicatorAuthor()
+{
+   return 'Forex Robot Easy Team';
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator settings                                         |
+//+------------------------------------------------------------------+
+void GetIndicatorSettings()
+{
+   printf('Fibonacci Levels: %d', fiboLevels);
+   printf('Timeframe: %s', EnumToString(timeframe));
+   printf('Price Type: %s', EnumToString(priceType));
+}
